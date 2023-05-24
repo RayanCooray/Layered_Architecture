@@ -3,6 +3,7 @@ package controller;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import dao.CustomerDAOImpl;
+import dao.ItemDAO;
 import dao.ItemDAOimpl;
 import db.DBConnection;
 import javafx.application.Platform;
@@ -43,6 +44,7 @@ public class ManageItemsFormController {
     public TableView<ItemTM> tblItems;
     public JFXTextField txtUnitPrice;
     public JFXButton btnAddNewItem;
+    ItemDAO itemDAO = new ItemDAOimpl();
 
     public void initialize() {
         tblItems.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("code"));
@@ -80,7 +82,7 @@ public class ManageItemsFormController {
 //            Connection connection = DBConnection.getDbConnection().getConnection();
 //            Statement stm = connection.createStatement();
 //            ResultSet rst = stm.executeQuery("SELECT * FROM Item");
-            ArrayList<ItemDTO> Items = ItemDAOimpl.getAllitems();
+            ArrayList<ItemDTO> Items = itemDAO.getAllitems();
             for (ItemDTO items: Items) {
                 tblItems.getItems().add(new ItemTM(items.getCode(), items.getDescription(), items.getUnitPrice(), items.getQtyOnHand()));
             }
@@ -138,7 +140,7 @@ public class ManageItemsFormController {
             if (!existItem(code)) {
                 new Alert(Alert.AlertType.ERROR, "There is no such item associated with the id " + code).show();
             }
-            boolean isupdated =ItemDAOimpl.deleteitem(code);
+            boolean isupdated = itemDAO.deleteitem(code);
 //            Connection connection = DBConnection.getDbConnection().getConnection();
 //            PreparedStatement pstm = connection.prepareStatement("DELETE FROM Item WHERE code=?");
 //            pstm.setString(1, code);
@@ -189,7 +191,7 @@ public class ManageItemsFormController {
 //                pstm.setBigDecimal(3, unitPrice);
 //                pstm.setInt(4, qtyOnHand);
 //                pstm.executeUpdate();
-                boolean issaved =ItemDAOimpl.saveitems(code , description ,unitPrice ,qtyOnHand );
+                boolean issaved =itemDAO.saveitems(code , description ,unitPrice ,qtyOnHand );
                 if (issaved){
                     loadAllItems();
                     tblItems.getItems().add(new ItemTM(code , description ,unitPrice , qtyOnHand));
@@ -210,7 +212,7 @@ public class ManageItemsFormController {
                     new Alert(Alert.AlertType.ERROR, "There is no such item associated with the id " + code).show();
                 }
                 /*Update Item*/
-                boolean isupdated =ItemDAOimpl.updateitem(code ,unitPrice, String.valueOf(qtyOnHand),description);
+                boolean isupdated =itemDAO.updateitem(code ,unitPrice, String.valueOf(qtyOnHand),description);
 //                Connection connection = DBConnection.getDbConnection().getConnection();
 //                PreparedStatement pstm = connection.prepareStatement("UPDATE Item SET description=?, unitPrice=?, qtyOnHand=? WHERE code=?");
 //                pstm.setString(1, description);
@@ -235,7 +237,7 @@ public class ManageItemsFormController {
         btnAddNewItem.fire();
     }
     private boolean existItem(String code) throws SQLException, ClassNotFoundException {
-        boolean isexitItem =ItemDAOimpl.existItems(code);
+        boolean isexitItem =itemDAO.existItems(code);
 //        Connection connection = DBConnection.getDbConnection().getConnection();
 //        PreparedStatement pstm = connection.prepareStatement("SELECT code FROM Item WHERE code=?");
 //        pstm.setString(1, code);
@@ -244,9 +246,9 @@ public class ManageItemsFormController {
     }
     private String generateNewId() {
         try {
-            String id = ItemDAOimpl.generateItemId();
+            String id = itemDAO.generateItemId();
             txtCode.setText(id);
-            return ItemDAOimpl.generateItemId();
+            return itemDAO.generateItemId();
 //            Connection connection = DBConnection.getDbConnection().getConnection();
 //            ResultSet rst = connection.createStatement().executeQuery("SELECT code FROM Item ORDER BY code DESC LIMIT 1;");
 //            if (rst.next()) {

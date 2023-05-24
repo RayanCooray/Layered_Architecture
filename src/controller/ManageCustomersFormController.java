@@ -2,6 +2,7 @@ package controller;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
+import dao.CustomerDAO;
 import dao.CustomerDAOImpl;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -25,10 +26,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * @author : Sanu Vithanage
- * @since : 0.1.0
- **/
 
 public class ManageCustomersFormController {
     public AnchorPane root;
@@ -39,6 +36,7 @@ public class ManageCustomersFormController {
     public JFXTextField txtCustomerAddress;
     public TableView<CustomerTM> tblCustomers;
     public JFXButton btnAddNewCustomer;
+    CustomerDAO customerDAO = new CustomerDAOImpl();
 
 
     public void initialize() {
@@ -74,7 +72,7 @@ public class ManageCustomersFormController {
 //            Connection connection = DBConnection.getDbConnection().getConnection();
 //            Statement stm = connection.createStatement();
 //            ResultSet rst = stm.executeQuery("SELECT * FROM Customer");
-            ArrayList<CustomerDTO> Customer = CustomerDAOImpl.getAllCustomer();
+            ArrayList<CustomerDTO> Customer = customerDAO.getAllCustomer();
             for (CustomerDTO customer : Customer) {
                 tblCustomers.getItems().add(new CustomerTM(customer.getId(),customer.getName(),customer.getAddress()));
             }
@@ -147,7 +145,7 @@ public class ManageCustomersFormController {
 //                pstm.setString(2, name);
 //                pstm.setString(3, address);
 //                pstm.executeUpdate();
-                boolean issaved =CustomerDAOImpl.savecustomer(id, name, address);
+                boolean issaved = customerDAO.savecustomer(id, name, address);
                 if (issaved){
                     loadAllCustomers();
                     tblCustomers.getItems().add(new CustomerTM(id, name, address));
@@ -174,7 +172,7 @@ public class ManageCustomersFormController {
 //                pstm.setString(2, address);
 //                pstm.setString(3, id);
 //                pstm.executeUpdate();
-                boolean isupdated =CustomerDAOImpl.updatecustomer(id, name, address);
+                boolean isupdated = customerDAO.updatecustomer(id, name, address);
             } catch (SQLException e) {
                 new Alert(Alert.AlertType.ERROR, "Failed to update the customer " + id + e.getMessage()).show();
             } catch (ClassNotFoundException e) {
@@ -189,7 +187,7 @@ public class ManageCustomersFormController {
         btnAddNewCustomer.fire();
     }
     public  boolean existCustomer(String id) throws SQLException, ClassNotFoundException {
-        boolean isexitcustomer =CustomerDAOImpl.exitcustomer(id);
+        boolean isexitcustomer =customerDAO.exitcustomer(id);
 //        Connection connection = DBConnection.getDbConnection().getConnection();
 //        PreparedStatement pstm = connection.prepareStatement("SELECT id FROM Customer WHERE id=?");
 //        pstm.setString(1, id);
@@ -207,7 +205,7 @@ public class ManageCustomersFormController {
 //            PreparedStatement pstm = connection.prepareStatement("DELETE FROM Customer WHERE id=?");
 //            pstm.setString(1, id);
 //            pstm.executeUpdate();
-            boolean isdelete =CustomerDAOImpl.deletecustomer(id);
+            boolean isdelete =customerDAO.deletecustomer(id);
             tblCustomers.getItems().remove(tblCustomers.getSelectionModel().getSelectedItem());
             tblCustomers.getSelectionModel().clearSelection();
             initUI();
@@ -219,9 +217,9 @@ public class ManageCustomersFormController {
     }
     private String generateNewId() {
         try {
-            String id = CustomerDAOImpl.generateNewId();
+            String id = customerDAO.generateNewId();
             txtCustomerId.setText(id);
-            return CustomerDAOImpl.generateNewId();
+            return customerDAO.generateNewId();
         } catch (SQLException e) {
             new Alert(Alert.AlertType.ERROR, "Failed to generate a new id " + e.getMessage()).show();
         } catch (ClassNotFoundException e) {
